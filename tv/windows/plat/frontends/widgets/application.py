@@ -360,6 +360,11 @@ class WindowsApplication(Application):
             is associated with anything at all.
         """
 
+        valid, assoc = self._is_explorer_associated(extension, value)
+        if valid:
+            return assoc;
+
+        # check for classic file associations
         try:
             handle = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, extension,
                                      0, _winreg.KEY_QUERY_VALUE)
@@ -378,6 +383,31 @@ class WindowsApplication(Application):
         except ValueError:
             is_associated = False
         return is_associated
+
+    def _is_explorer_associated(self, extension, value=None):
+        """ Check for windows explorer file associations. """
+        subkey = ("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\"
+               + extension + "\\UserChoice")
+        try:
+            handle = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
+                subkey, 0, _winreg.KEY_QUERY_VALUE)
+        except WindowsError, e:
+            if e.errno == 2:
+                # Key does not exist
+                return False, None
+            else:
+                raise
+
+        handle = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
+                subkey, 0, _winreg.KEY_QUERY_VALUE)
+        try:
+            regval, type = _winreg.QueryValueEx(handle, "ProgId")
+            associated = regval == value
+        except WindowsError:
+            associated = False
+
+        handle.Close()
+        return True, associated
 
     def get_main_window_dimensions(self):
         """Gets x, y, width, height from config.
