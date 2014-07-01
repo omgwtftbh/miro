@@ -69,9 +69,9 @@ BLACKLISTED_FILE_EXTENSIONS = ('.ade', '.adp', '.asx', '.bas', '.bat', '.chm',
                                '.cmd', '.com', '.cpl', '.crt', '.exe', '.hlp',
                                '.hta', '.inf', '.ins', '.isp', '.js', '.jse',
                                '.lnk', '.mda', '.mdb', '.mde', '.mdt', '.mdw',
-                               '.mdz', '.msc', '.msi', '.msp', '.mst', '.ops',
+                               '.mdz', '.msc', '.msi', '.msp', '.mst', '.nfo', '.ops',
                                '.pcd', '.pif', '.prf', '.reg', '.scf', '.scr',
-                               '.sct', '.shb', '.shs', '.url', '.vb', '.vbe',
+                               '.sct', '.shb', '.shs', '.txt', '.url', '.vb', '.vbe',
                                '.vbs', '.wsc', '.wsf', '.wsh')
 
 def run_application():
@@ -360,7 +360,7 @@ class WindowsApplication(Application):
             is associated with anything at all.
         """
 
-        valid, assoc = self._is_explorer_associated(extension, value)
+        valid, assoc = self._is_associated_explorer(extension, value)
         if valid:
             return assoc;
 
@@ -384,7 +384,7 @@ class WindowsApplication(Application):
             is_associated = False
         return is_associated
 
-    def _is_explorer_associated(self, extension, value=None):
+    def _is_associated_explorer(self, extension, value=None):
         """ Check for windows explorer file associations. """
         subkey = ("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\"
                + extension + "\\UserChoice")
